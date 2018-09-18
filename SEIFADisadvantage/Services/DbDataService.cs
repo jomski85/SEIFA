@@ -57,12 +57,10 @@ namespace SEIFADisadvantage.Services
             List<SeifaInfo2011> items2011;
 
             //1. Retrieve places under a specific state
-            items2016 = _dbContext.Data2016.OrderByDescending(p => p.DisadvantageScore)
-                                                                    .Where(item => _isInState(item.LgaCode, param.State))
+            items2016 = _dbContext.Data2016.Where(item => _isInState(item.LgaCode, param.State))
                                                                     .ToList();
 
-            items2011 = _dbContext.Data2011.OrderByDescending(p => p.Disadvantage)
-                                                            .Where(item => _isInState(item.State, param.State))
+            items2011 = _dbContext.Data2011.Where(item => _isInState(item.State, param.State))
                                                             .ToList();
 
             //2. Collate Results
