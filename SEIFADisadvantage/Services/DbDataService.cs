@@ -261,7 +261,7 @@ namespace SEIFADisadvantage.Services
                         EconomicResourcesDecile = int.TryParse(attributes[7], out value) ? value : -1,
                         EducationAndOccupationScore = int.TryParse(attributes[8], out value) ? value : -1,
                         EducationAndOccupationDecile = int.TryParse(attributes[9], out value) ? value : -1,
-                        Population = 0
+                        Population = 0 //TODO: Implement escaped quotes 
                     };
 
                     _dbContext.Data2016.Add(newItem);
