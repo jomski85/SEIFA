@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace SEIFADisadvantage.Services
@@ -196,7 +197,7 @@ namespace SEIFADisadvantage.Services
             var file = string.Format("{0}\\AppData\\SEIFA_2011.csv", currentDir);
             
             string line;
-
+            Regex CSVParser = new Regex(",(?=(?:[^\"]*\"[^\"]*\")*(?![^\"]*\"))");
             //Get 2011 data
             using (var fileStreamReader = new System.IO.StreamReader(file))
             {
@@ -204,20 +205,28 @@ namespace SEIFADisadvantage.Services
                 string headerLine = fileStreamReader.ReadLine();
                 while ((line = fileStreamReader.ReadLine()) != null)
                 {
-                    var attributes = line.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    //var attributes = line.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    var attributes = CSVParser.Split(line);
                     if (attributes == null || attributes.Length != 4)
                         continue;
 
-                    //Do Parsing here
-                    var newItem = new SeifaInfo2011()
+                    try
                     {
-                        State = attributes[0].Trim(),
-                        Place = attributes[1].Trim(),
-                        Disadvantage = Convert.ToInt32(attributes[2]),
-                        AdvantageDisadvantage = Convert.ToInt32(attributes[3])
-                    };
+                        //Do Parsing here
+                        var newItem = new SeifaInfo2011()
+                        {
+                            State = attributes[0].Trim(),
+                            Place = attributes[1].Trim(),
+                            Disadvantage = Convert.ToInt32(attributes[2].Trim('\"').Replace(",", string.Empty)),
+                            AdvantageDisadvantage = Convert.ToInt32(attributes[3].Trim('\"').Replace(",", string.Empty))
+                        };
 
-                    _dbContext.Data2011.Add(newItem);
+                        _dbContext.Data2011.Add(newItem);
+                    }
+                    catch
+                    {
+                        continue;
+                    }
                 }
             }
 
@@ -236,35 +245,48 @@ namespace SEIFADisadvantage.Services
             
             string line;
 
+            Regex CSVParser = new Regex(",(?=(?:[^\"]*\"[^\"]*\")*(?![^\"]*\"))");
+
             //Get 2016 data
             using (var fileStreamReader = new System.IO.StreamReader(file))
             {
                 //This is the header, we read it and move on
                 string headerLine = fileStreamReader.ReadLine();
+
                 while ((line = fileStreamReader.ReadLine()) != null)
                 {
-                    var attributes = line.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    var attributes = CSVParser.Split(line);
+
                     if (attributes == null || attributes.Length < 11)
                         continue;
 
                     int value = 0;
-                    //Do Parsing here
-                    var newItem = new SeifaInfo2016()
+                    try
                     {
-                        LgaCode = Convert.ToInt32(attributes[0]),
-                        Place = attributes[1].Trim(),
-                        DisadvantageScore = int.TryParse(attributes[2], out value) ? value : -1,
-                        DisadvantageDecile= int.TryParse(attributes[3], out value) ? value : -1,
-                        AdvantageAndDisadvantageDecile = int.TryParse(attributes[4], out value) ? value : -1,
-                        AdvantageAndDisadvantageScore = int.TryParse(attributes[5], out value) ? value : -1,
-                        EconomicResourcesScore = int.TryParse(attributes[6], out value) ? value : -1,
-                        EconomicResourcesDecile = int.TryParse(attributes[7], out value) ? value : -1,
-                        EducationAndOccupationScore = int.TryParse(attributes[8], out value) ? value : -1,
-                        EducationAndOccupationDecile = int.TryParse(attributes[9], out value) ? value : -1,
-                        Population = 0 //TODO: Implement escaped quotes 
-                    };
+                        //Do Parsing here
+                        var newItem = new SeifaInfo2016()
+                        {
+                            LgaCode = Convert.ToInt32(attributes[0].Trim('\"').Replace(',', '\0')),
+                            Place = attributes[1].Trim(),
+                            DisadvantageScore = int.TryParse(attributes[2].Trim('\"').Replace(",", string.Empty), out value) ? value : -1,
+                            DisadvantageDecile = int.TryParse(attributes[3].Trim('\"').Replace(",", string.Empty), out value) ? value : -1,
+                            AdvantageAndDisadvantageDecile = int.TryParse(attributes[4].Trim('\"').Replace(",", string.Empty), out value) ? value : -1,
+                            AdvantageAndDisadvantageScore = int.TryParse(attributes[5].Trim('\"').Replace(",", string.Empty), out value) ? value : -1,
+                            EconomicResourcesScore = int.TryParse(attributes[6].Trim('\"').Replace(",", string.Empty), out value) ? value : -1,
+                            EconomicResourcesDecile = int.TryParse(attributes[7].Trim('\"').Replace(",", string.Empty), out value) ? value : -1,
+                            EducationAndOccupationScore = int.TryParse(attributes[8].Trim('\"').Replace(",", string.Empty), out value) ? value : -1,
+                            EducationAndOccupationDecile = int.TryParse(attributes[9].Trim('\"').Replace(",", string.Empty), out value) ? value : -1,
+                            Population = int.TryParse(attributes[10].Trim('\"').Replace(",",string.Empty), out value) ? value : -1
+                        };
 
-                    _dbContext.Data2016.Add(newItem);
+                        _dbContext.Data2016.Add(newItem);
+                    }
+                    catch
+                    {
+                        continue;
+                    }
+
+                    
                 }
             }
 
