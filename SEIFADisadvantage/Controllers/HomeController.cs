@@ -19,6 +19,7 @@ namespace SEIFADisadvantage.Controllers
 
         public IActionResult Index()
         {
+            //Let's set up our default parameters
             var param = new SearchInfoParam()
             {
                 State = AuState.VIC,
@@ -28,8 +29,10 @@ namespace SEIFADisadvantage.Controllers
                 ShowHigherMedianScore =true
             };
 
+            //Call our service
             var items = _dataProvider.GetData(param);
 
+            //Transfer back the results to our View model
             var vm = new SeifaResultsViewModel()
             {
                 State = AuState.VIC,
@@ -40,6 +43,7 @@ namespace SEIFADisadvantage.Controllers
                 TotalItems = items.TotalItems,
             };
 
+            //Compute the number of pages
             var totalPages = vm.TotalItems / (int)vm.PageSize;
 
             if (totalPages % (int)vm.PageSize > 0)
@@ -48,12 +52,14 @@ namespace SEIFADisadvantage.Controllers
             for (int i = 0; i < totalPages; i++)
                 vm.Pages.Add(i+1);
 
+            //Display
             return View(vm);
         }
 
         [HttpPost]
         public IActionResult SearchResults(SeifaResultsViewModel param)
         {
+            //Transfer the search param from the view model to the proper parameter
             var searchParam = new SearchInfoParam()
             {
                 State = param.State,
@@ -63,8 +69,10 @@ namespace SEIFADisadvantage.Controllers
                 ShowHigherMedianScore = param.ShowHigherMedianScore
             };
 
+            //Call our service
             var items = _dataProvider.GetData(searchParam);
 
+            //Transfer back the result to our view model
             var vm = new SeifaResultsViewModel()
             {
                 State = param.State,
@@ -75,6 +83,7 @@ namespace SEIFADisadvantage.Controllers
                 TotalItems = items.TotalItems
             };
 
+            //COmpute for the number of pages
             if (param.PageSize != PageSize.All)
             {
                 var totalPages = vm.TotalItems / (int)vm.PageSize;
@@ -86,6 +95,7 @@ namespace SEIFADisadvantage.Controllers
                     vm.Pages.Add(i + 1);
             }
 
+            //Display
             return View("Index",vm);
         }
     }

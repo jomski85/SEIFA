@@ -13,10 +13,18 @@ using System.Threading.Tasks;
 
 namespace SEIFADisadvantage.Services
 {
+    /// <summary>
+    /// Does the bulk of loading the data to the database and collating the different data formats
+    /// </summary>
     public class DbDataService : ISeifaDataService
     {
         private SeifaInfoDbContext _dbContext;
         private IDictionary<string, SeiafaInfo> _collatedItems;
+
+        /// <summary>
+        /// Constructor that takes in a DbContext to read/write data to/from
+        /// </summary>
+        /// <param name="dbContext"></param>
         public DbDataService(SeifaInfoDbContext dbContext)
         {
             _collatedItems = new SortedDictionary<string, SeiafaInfo>();
@@ -82,6 +90,12 @@ namespace SEIFADisadvantage.Services
             return resultInfo;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="lgaCode"></param>
+        /// <param name="state"></param>
+        /// <returns></returns>
         private bool _isInState(int lgaCode, AuState state)
         {
             if (state == AuState.All)
@@ -94,6 +108,12 @@ namespace SEIFADisadvantage.Services
             return (lgaCode == (int)state);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="itemState"></param>
+        /// <param name="stateToCompare"></param>
+        /// <returns></returns>
         private bool _isInState(string itemState, AuState stateToCompare)
         {
             if (stateToCompare == AuState.All)
@@ -103,6 +123,10 @@ namespace SEIFADisadvantage.Services
             return string.Compare(itemState, strState, true) == 0;
         }
 
+        /// <summary>
+        /// Combines 2011 and 2016 results
+        /// </summary>
+        /// <param name="results"></param>
         private void _collateResults(List<SeifaInfo2011> results)
         {
             foreach (var item in results)
@@ -118,6 +142,10 @@ namespace SEIFADisadvantage.Services
             }
         }
 
+        /// <summary>
+        /// Combines 2011 and 2016 results
+        /// </summary>
+        /// <param name="results"></param>
         private void _collateResults(List<SeifaInfo2016> results)
         {
             foreach (var item in results)
@@ -134,29 +162,38 @@ namespace SEIFADisadvantage.Services
         }
 
         /// <summary>
-        /// 
+        /// Sanitize Place Name (remove the '(X)')
         /// </summary>
         /// <param name="placeName"></param>
         /// <returns></returns>
         private string _sanitizeName(string placeName)
         {
             var foundIndex = placeName.IndexOf('(');
+
             if (foundIndex > 0)
             {
                 var sanitizedStr = placeName.Substring(0, foundIndex);
                 sanitizedStr = sanitizedStr.Replace('-', ' ');
-                return sanitizedStr.Trim(); ;
+                return sanitizedStr.Trim();
             }
 
             return placeName;
         }
 
+        /// <summary>
+        /// Gets the state given the LGA Code. 
+        /// </summary>
+        /// <param name="LgaCode"></param>
+        /// <returns></returns>
         private string _getState(int LgaCode)
         {
             //we get the first digit of the lgaCode
+            //The first digit pertains to the State
             while (LgaCode >= 10)
                 LgaCode /= 10;
 
+            //Lga Codes are define here
+            //http://www.abs.gov.au/ausstats/abs@.nsf/Lookup/by%20Subject/1270.0.55.003~July%202016~Main%20Features~Local%20Government%20Areas%20(LGA)~7
             switch (LgaCode)
             {
                 case 1:
