@@ -36,7 +36,11 @@ namespace SEIFADisadvantage
             });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            //Register our Database Context
             services.AddDbContext<SeifaInfoDbContext>(option => option.UseSqlServer(Configuration.GetConnectionString("Default")));
+
+            //Register our Data Service
             services.AddScoped<ISeifaDataService, DbDataService>();
         }
 
@@ -57,6 +61,7 @@ namespace SEIFADisadvantage
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
+            //Set up our default routing
             app.UseMvc(ConfigureRoutes);
         }
 

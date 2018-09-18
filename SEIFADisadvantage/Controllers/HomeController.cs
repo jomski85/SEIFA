@@ -64,7 +64,7 @@ namespace SEIFADisadvantage.Controllers
             {
                 State = param.State,
                 Page = param.Page-1,
-                PageSize = param.PageSize == PageSize.All ? 2000 : (int)param.PageSize,
+                PageSize = param.PageSize == PageSize.All ? 20000 : (int)param.PageSize,
                 ShowAll = param.PageSize == PageSize.All,
                 ShowHigherMedianScore = param.ShowHigherMedianScore
             };

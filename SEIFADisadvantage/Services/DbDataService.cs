@@ -38,6 +38,11 @@ namespace SEIFADisadvantage.Services
                 _initialize2016Data();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
         public SearchInfoResults GetData(SearchInfoParam param)
         {
             var resultInfo = new SearchInfoResults();
@@ -52,7 +57,6 @@ namespace SEIFADisadvantage.Services
             List<SeifaInfo2011> items2011;
 
             //1. Retrieve places under a specific state
-
             items2016 = _dbContext.Data2016.OrderByDescending(p => p.DisadvantageScore)
                                                                     .Where(item => _isInState(item.LgaCode, param.State))
                                                                     .ToList();
