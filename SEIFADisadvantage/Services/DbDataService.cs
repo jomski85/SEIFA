@@ -71,10 +71,21 @@ namespace SEIFADisadvantage.Services
             //now for the median (get the upper half
             if (param.ShowHigherMedianScore && resultItems.Count > 1)
             {
+                //Ascending Order
                 var descOrderList = resultItems.OrderBy(item => item.TotalScore).ToList();
-                int halfLen = descOrderList.Count / 2;
 
-                resultItems = descOrderList.GetRange(halfLen, halfLen);
+                //COmpupte the half point index
+                int halfLen = descOrderList.Count / 2;
+                int startIndex = halfLen;
+
+                //Check if odd or even
+                if (descOrderList.Count % 2 > 0)
+                    halfLen++;
+
+                //get the greater half
+                resultItems = descOrderList.GetRange(startIndex, halfLen);
+
+                //Arrange by name
                 resultItems = resultItems.OrderBy(item => item.Name).ToList();
             }
 
