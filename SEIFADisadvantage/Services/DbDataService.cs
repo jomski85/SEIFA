@@ -71,7 +71,7 @@ namespace SEIFADisadvantage.Services
 
             var resultItems = _collatedItems.Values.ToList();
             //now for the median (get the upper half
-            if (param.ShowHigherMedianScore)
+            if (param.ShowHigherMedianScore && resultItems.Count > 1)
             {
                 var descOrderList = resultItems.OrderBy(item => item.TotalScore).ToList();
                 int halfLen = descOrderList.Count / 2;
